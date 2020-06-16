@@ -7,7 +7,7 @@ def gridding_arcalg(radar):
 	#radar: Quality-controlled volume data
 	#Z0C: Height of freezing level in meters
     print('Grid Section')
-    #Create grid of data on a ~250m x 250m x 250m grid (500x500x41 Volume array)
+    #Create grid of data on a ~500m x 500m x 500m grid (500x500x41 Volume array)
     grid = pyart.map.grid_from_radars(
     	(radar,),
     	grid_shape=(41, 500, 500),
@@ -25,8 +25,8 @@ def gridding_arcalg(radar):
     ZDRmasked1 = ma.masked_where(REF < 20, ZDR)
     REFmasked = ma.masked_where(REF < 20, REF)
 
-    #Use a 50 dBZ mask for KDP to only get areas in the storm core. This threshold should be considered more closely
-    KDPmasked = ma.masked_where(REF < 50, KDP)
+    #Use a 35 dBZ mask for KDP to only get areas in the storm core. This threshold should be considered more closely
+    KDPmasked = ma.masked_where(REF < 35, KDP)
     KDPmasked = ma.filled(KDPmasked, fill_value = -2)
 
     #Create 2D coordinate arrays used for tracking/place files
