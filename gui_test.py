@@ -1,5 +1,5 @@
 from tkinter import *
-from arcalg_framework import multi_case_algorithm_ML1_arcdev
+from arcalg_framework_newforest import multi_case_algorithm_ML1_newforest
 from arcalg_framework_realtime import multi_case_algorithm_ML1_realtime
 
 import numpy as np
@@ -387,7 +387,7 @@ class Window(Frame):
         print(" ")
         print('Running Algorithm')
 
-        tracks_dataframe, zdroutlines = multi_case_algorithm_ML1_arcdev(ffdangle,zdr_t,kdp_t,z1,z2,bs1,70,2,year1,month1,day1,hour1,min1,dur1,zdr_cal,site,storm_motion, track_dis=10)
+        tracks_dataframe, zdroutlines = multi_case_algorithm_ML1_newforest(ffdangle,zdr_t,kdp_t,z1,z2,bs1,70,2,year1,month1,day1,hour1,min1,dur1,zdr_cal,site,storm_motion, track_dis=10)
         
         tracks_dataframe.to_pickle('ARCDEV_GUI'+str(year1)+str(month1)+str(day1)+str(site)+'.pkl')
 
