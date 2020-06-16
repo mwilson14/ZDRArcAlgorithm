@@ -99,7 +99,8 @@ def multi_case_algorithm_ML1_realtime(storm_relative_dir, zdrlev, kdplev, REFlev
     f.flush()
 
     #Load ML algorithm
-    forest_loaded = pickle.load(open('BestRandomForest.pkl', 'rb'))
+    forest_loaded = pickle.load(open('NewDataRandomForest.pkl', 'rb'))
+    #forest_loaded = pickle.load(open('BestRandomForest.pkl', 'rb'))
 #    forest_loaded_col = pickle.load(open('BestRandomForestColumnsLEN200.pkl', 'rb'))
 
     #Actual algorithm code starts here
@@ -137,7 +138,10 @@ def multi_case_algorithm_ML1_realtime(storm_relative_dir, zdrlev, kdplev, REFlev
     while not ticker.wait(WAIT_TIME_SECONDS):
     #     print('time')
     #     print(time1)
-        radar4, time_start = get_latest_scan(station)
+        try:
+            radar4, time_start = get_latest_scan(station)
+        except:
+            continue
         print(time_start.hour)
         print(time_start.minute)
         print(time_start.second)
@@ -191,8 +195,8 @@ def multi_case_algorithm_ML1_realtime(storm_relative_dir, zdrlev, kdplev, REFlev
             day = time_start.day
             if day < 10:
                 day = '0'+str(day)
-            time_beg = time_start - timedelta(minutes=0.1)
-            time_end = time_start + timedelta(minutes=GR_mins)
+            time_beg = time_start - timedelta(minutes=0.5)
+            time_end = time_start + timedelta(minutes=GR_mins+1.0)
             sec_beg = time_beg.second
             sec_end = time_end.second
             min_beg = time_beg.minute
