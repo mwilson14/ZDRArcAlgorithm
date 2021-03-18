@@ -1,7 +1,7 @@
 import numpy as np
 from shapely import geometry
 from shapely.ops import transform
-from metpy.units import atleast_1d, check_units, concatenate, units
+from metpy.units import check_units, concatenate, units
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 from pyproj import Geod

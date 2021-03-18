@@ -2,7 +2,7 @@ import numpy as np
 import numpy.ma as ma
 from shapely import geometry
 from shapely.ops import transform
-from metpy.units import atleast_1d, check_units, concatenate, units
+from metpy.units import check_units, concatenate, units
 from matplotlib.path import Path
 from pyproj import Geod
 

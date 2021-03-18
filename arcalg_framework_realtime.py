@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pyart
 import numpy as np
 import numpy.ma as ma
-from metpy.units import atleast_1d, check_units, concatenate, units
+from metpy.units import check_units, concatenate, units
 from matplotlib.patches import PathPatch
 from matplotlib.path import Path
 from siphon.radarserver import RadarServer
@@ -14,7 +14,6 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
-from metpy.units import atleast_1d, check_units, concatenate, units
 from shapely.geometry import polygon as sp
 import pyproj 
 import shapely.ops as ops

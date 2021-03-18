@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pyart
 import numpy as np
 import numpy.ma as ma
-from metpy.units import atleast_1d, check_units, concatenate, units
+from metpy.units import check_units, concatenate, units
 from matplotlib.patches import PathPatch
 from matplotlib.path import Path
 from siphon.radarserver import RadarServer
@@ -14,7 +14,6 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
-from metpy.units import atleast_1d, check_units, concatenate, units
 from shapely.geometry import polygon as sp
 import pyproj 
 import shapely.ops as ops
@@ -115,6 +114,17 @@ def multi_case_algorithm_ML1_arcdev(storm_relative_dir, zdrlev, kdplev, REFlev, 
         if radar1.nsweeps > zero_z_trigger:
             continue
             
+        #Updating this to account for recently-added sub-0.5 degree tilts
+        for i in range(radar1.nsweeps):
+            radar2 = radar1.extract_sweeps([i])
+            print(np.mean(radar2.elevation['data']))
+            tilt_vals.append(np.mean(radar2.elevation['data']))
+        tilt_vals = np.asarray(tilt_vals)
+        max_tilt = 0.65
+        if np.min(tilt_vals) < 0.40:
+            max_tilt = np.min(tilt_vals) + 0.07
+        print('Max tilt is ', max_tilt)
+            
         for i in range(radar1.nsweeps):
             print('in loop')
             print(radar1.nsweeps)
@@ -123,7 +133,7 @@ def multi_case_algorithm_ML1_arcdev(storm_relative_dir, zdrlev, kdplev, REFlev, 
             except:
                 print('bad file')
             #Checking to make sure the tilt in question has all needed data and is the right elevation
-            if ((np.mean(radar4.elevation['data']) < .65) and (np.max(np.asarray(radar4.fields['differential_reflectivity']['data'])) != np.min(np.asarray(radar4.fields['differential_reflectivity']['data'])))):
+            if ((np.mean(radar4.elevation['data']) < max_tilt) and (np.max(np.asarray(radar4.fields['differential_reflectivity']['data'])) != np.min(np.asarray(radar4.fields['differential_reflectivity']['data'])))):
                 n = n+1
 
                 #Calling ungridded_section; Pulling apart radar sweeps and creating ungridded data arrays
