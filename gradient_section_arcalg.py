@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.ma as ma
 from scipy import ndimage as ndi
-from metpy.units import atleast_1d, check_units, concatenate, units
+from metpy.units import check_units, concatenate, units
 from metpy.calc import wind_direction, wind_speed, wind_components
 
 def grad_mask_arcalg(REFmasked,REF,storm_relative_dir,ZDRmasked1,CC):

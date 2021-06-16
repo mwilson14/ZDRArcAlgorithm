@@ -116,6 +116,7 @@ def multi_case_algorithm_ML1_newforest(storm_relative_dir, zdrlev, kdplev, REFle
             continue
             
         #Updating this to account for recently-added sub-0.5 degree tilts
+        tilt_vals = []
         for i in range(radar1.nsweeps):
             radar2 = radar1.extract_sweeps([i])
             #print(np.mean(radar2.elevation['data']))
