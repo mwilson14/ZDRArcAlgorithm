@@ -7,7 +7,7 @@ def gridding_arcalg(radar):
 	#radar: Quality-controlled volume data
 	#Z0C: Height of freezing level in meters
     print('Grid Section')
-    #Create grid of data on a ~500m x 500m x 500m grid (500x500x41 Volume array)
+    #Create grid of data on a ~500m x 500m x 250m grid (500x500x41 Volume array)
     grid = pyart.map.grid_from_radars(
     	(radar,),
     	grid_shape=(41, 500, 500),
