@@ -98,7 +98,7 @@ def multi_case_algorithm_ML1_realtime(storm_relative_dir, zdrlev, kdplev, REFlev
     f.flush()
 
     #Load ML algorithm
-    forest_loaded = pickle.load(open('NewDataRandomForest.pkl', 'rb'))
+    forest_loaded = pickle.load(open('NewData2022RandomForest.pkl', 'rb'))
     #forest_loaded = pickle.load(open('BestRandomForest.pkl', 'rb'))
 #    forest_loaded_col = pickle.load(open('BestRandomForestColumnsLEN200.pkl', 'rb'))
 
@@ -294,14 +294,17 @@ def multi_case_algorithm_ML1_realtime(storm_relative_dir, zdrlev, kdplev, REFlev
             refc = ax.contour(rlons[0,:,:],rlats[0,:,:],smoothed_ref,REFlev, alpha=.01)
 
             #Set up projection for area calculations
+            proj_old = partial(pyproj.transform, pyproj.Proj(init='epsg:4326'),
+                           pyproj.Proj(init='epsg:3857'))
             proj = partial(pyproj.transform, pyproj.Proj(init='epsg:4326'),
-                       pyproj.Proj(init='epsg:3857'))
+                       pyproj.Proj("+proj=aea +lat_1=37.0 +lat_2=41.0 +lat_0=39.0 +lon_0=-106.55"))
 
             #Main part of storm tracking algorithm starts by looping through all contours looking for Z centroids
             #This method for breaking contours into polygons based on this stack overflow tutorial:
             #https://gis.stackexchange.com/questions/99917/converting-matplotlib-contour-objects-to-shapely-objects
             #Calling stormid_section
-            [storm_ids,max_lons_c,max_lats_c,ref_areas,storm_index] = storm_objects(refc,proj,REFlev,REFlev1,big_storm,smoothed_ref,ax,rlons,rlats,storm_index,tracking_index,scan_index,tracks_dataframe, track_dis)
+            [storm_ids,max_lons_c,max_lats_c,ref_areas,storm_index] = storm_objects(refc,proj_old,REFlev,REFlev1,big_storm,smoothed_ref,ax,rlons,rlats,storm_index,tracking_index,scan_index,tracks_dataframe, track_dis)
+
 
             #Setup tracking index for storm of interest
             tracking_ind=np.where(np.asarray(storm_ids)==storm_to_track)[0]

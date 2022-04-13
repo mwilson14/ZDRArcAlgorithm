@@ -14,6 +14,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
+from metpy.units import check_units, concatenate, units
 from shapely.geometry import polygon as sp
 import pyproj 
 import shapely.ops as ops
@@ -46,7 +47,7 @@ from zhh_section import zhh_objects
 from kdpfoot_section import kdp_objects
 #from zdr_col_section import zdrcol
 
-def multi_case_algorithm_ML1_newforest(storm_relative_dir, zdrlev, kdplev, REFlev, REFlev1, big_storm, zero_z_trigger, storm_to_track, year, month, day, hour, start_min, duration, calibration, station, Bunkers_m, track_dis=10, GR_mins=1.0):
+def multi_case_algorithm_ML1_newforest_loc(storm_relative_dir, zdrlev, kdplev, REFlev, REFlev1, big_storm, zero_z_trigger, storm_to_track, year, month, day, hour, start_min, duration, calibration, station, localfolder, Bunkers_m, track_dis=10, GR_mins=1.0):
     #Set vector perpendicular to FFD Z gradient
     storm_relative_dir = storm_relative_dir
     #Set storm motion
@@ -73,12 +74,12 @@ def multi_case_algorithm_ML1_newforest(storm_relative_dir, zdrlev, kdplev, REFle
     dt = datetime(year,month, day, hour, start_min)
     station = station
     end_dt = dt + timedelta(hours=duration)
-
+    folder=localfolder
     print(dt, end_dt)
     #Set up nexrad interface
-    conn = nexradaws.NexradAwsInterface()
-    scans = conn.get_avail_scans_in_range(dt,end_dt,station)
-    results = conn.download(scans, 'RadarFolder')
+    #conn = nexradaws.NexradAwsInterface()
+    #scans = conn.get_avail_scans_in_range(dt,end_dt,station)
+    #results = conn.download(scans, 'RadarFolder')
 
     #Setting counters for figures and Pandas indices
     f = 27
@@ -101,11 +102,12 @@ def multi_case_algorithm_ML1_newforest(storm_relative_dir, zdrlev, kdplev, REFle
     #Create a list for the lists of arc outlines
     zdr_out_list = []
     tracks_dataframe = []
-    for i,scan in enumerate(results.iter_success(),start=1):
+    #for i,scan in enumerate(results.iter_success(),start=1):
     #Local file option:
+    for radar_file in os.listdir(folder):
         #Loop over all files in the dataset and pull out each 0.5 degree tilt for analysis
         try:
-            radar1 = scan.open_pyart()
+            radar1 = pyart.io.nexrad_archive.read_nexrad_archive(folder+'/'+radar_file)
         except:
             print('bad radar file')
             continue
@@ -115,18 +117,6 @@ def multi_case_algorithm_ML1_newforest(storm_relative_dir, zdrlev, kdplev, REFle
         if radar1.nsweeps > zero_z_trigger:
             continue
             
-        #Updating this to account for recently-added sub-0.5 degree tilts
-        tilt_vals = []
-        for i in range(radar1.nsweeps):
-            radar2 = radar1.extract_sweeps([i])
-            #print(np.mean(radar2.elevation['data']))
-            tilt_vals.append(np.mean(radar2.elevation['data']))
-        tilt_vals = np.asarray(tilt_vals)
-        max_tilt = 0.65
-        if np.min(tilt_vals) < 0.40:
-            max_tilt = np.min(tilt_vals) + 0.07
-        #print('Max tilt is ', max_tilt)
-            
         for i in range(radar1.nsweeps):
             print('in loop')
             print(radar1.nsweeps)
@@ -135,7 +125,7 @@ def multi_case_algorithm_ML1_newforest(storm_relative_dir, zdrlev, kdplev, REFle
             except:
                 print('bad file')
             #Checking to make sure the tilt in question has all needed data and is the right elevation
-            if ((np.mean(radar4.elevation['data']) < max_tilt) and (np.max(np.asarray(radar4.fields['differential_reflectivity']['data'])) != np.min(np.asarray(radar4.fields['differential_reflectivity']['data'])))):
+            if ((np.mean(radar4.elevation['data']) < .65) and (np.max(np.asarray(radar4.fields['differential_reflectivity']['data'])) != np.min(np.asarray(radar4.fields['differential_reflectivity']['data'])))):
                 n = n+1
 
                 #Calling ungridded_section; Pulling apart radar sweeps and creating ungridded data arrays
@@ -259,7 +249,7 @@ def multi_case_algorithm_ML1_newforest(storm_relative_dir, zdrlev, kdplev, REFle
                            pyproj.Proj(init='epsg:3857'))
                 proj = partial(pyproj.transform, pyproj.Proj(init='epsg:4326'),
                            pyproj.Proj("+proj=aea +lat_1=37.0 +lat_2=41.0 +lat_0=39.0 +lon_0=-106.55"))
-
+                
                 #Main part of storm tracking algorithm starts by looping through all contours looking for Z centroids
                 #This method for breaking contours into polygons based on this stack overflow tutorial:
                 #https://gis.stackexchange.com/questions/99917/converting-matplotlib-contour-objects-to-shapely-objects
